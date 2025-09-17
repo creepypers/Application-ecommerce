@@ -1,0 +1,124 @@
+@model TPECOM.Models.User
+@{
+    ViewData["Title"] = "Inscription";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4 p-md-5">
+                    <h1 class="h3 mb-4 text-center">Créer un compte</h1>
+                    
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger mb-4">
+                            <ul class="mb-0">
+                                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                {
+                                    <li>@error.ErrorMessage</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                    
+                    <form method="post" action="/Account/Register">
+                        <div class="mb-4">
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="UserType" id="userTypeClient" value="Client" checked autocomplete="off">
+                                <label class="btn btn-outline-dark" for="userTypeClient">Client</label>
+                                
+                                <input type="radio" class="btn-check" name="UserType" id="userTypeVendeur" value="Vendeur" autocomplete="off">
+                                <label class="btn btn-outline-dark" for="userTypeVendeur">Vendeur</label>
+                            </div>
+                        </div>
+                        
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="FirstName" class="form-label">Prénom</label>
+                                <input type="text" class="form-control" id="FirstName" name="FirstName" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="LastName" class="form-label">Nom</label>
+                                <input type="text" class="form-control" id="LastName" name="LastName" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="Email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="Email" name="Email" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="Password" class="form-label">Mot de passe</label>
+                            <input type="password" class="form-control" id="Password" name="Password" required minlength="6">
+                            <div class="form-text">Le mot de passe doit contenir au moins 6 caractères.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="ConfirmPassword" class="form-label">Confirmer le mot de passe</label>
+                            <input type="password" class="form-control" id="ConfirmPassword" name="ConfirmPassword" required>
+                        </div>
+                        
+                        <!-- Champs spécifiques aux vendeurs (masqués par défaut) -->
+                        <div id="vendeurFields" style="display: none;">
+                            <hr class="my-4">
+                            <h4 class="h5 mb-3">Informations de l'entreprise</h4>
+                            
+                            <div class="mb-3">
+                                <label for="CompanyName" class="form-label">Nom de l'entreprise</label>
+                                <input type="text" class="form-control" id="CompanyName" name="CompanyName">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="CompanyAddress" class="form-label">Adresse de l'entreprise</label>
+                                <input type="text" class="form-control" id="CompanyAddress" name="CompanyAddress">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="CompanyPhone" class="form-label">Téléphone de l'entreprise</label>
+                                <input type="tel" class="form-control" id="CompanyPhone" name="CompanyPhone">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="CompanyDescription" class="form-label">Description de l'entreprise</label>
+                                <textarea class="form-control" id="CompanyDescription" name="CompanyDescription" rows="3"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="termsCheck" required>
+                            <label class="form-check-label" for="termsCheck">J'accepte les <a href="/Home/Terms" class="text-decoration-none">conditions d'utilisation</a> et la <a href="/Home/Privacy" class="text-decoration-none">politique de confidentialité</a>.</label>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-dark">Créer mon compte</button>
+                        </div>
+                    </form>
+                    
+                    <div class="mt-4 text-center">
+                        <p>Vous avez déjà un compte ? <a href="/Account/Login" class="text-decoration-none">Connectez-vous</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Afficher/masquer les champs spécifiques aux vendeurs
+        document.addEventListener('DOMContentLoaded', function() {
+            const userTypeClient = document.getElementById('userTypeClient');
+            const userTypeVendeur = document.getElementById('userTypeVendeur');
+            const vendeurFields = document.getElementById('vendeurFields');
+            
+            function toggleVendeurFields() {
+                vendeurFields.style.display = userTypeVendeur.checked ? 'block' : 'none';
+            }
+            
+            userTypeClient.addEventListener('change', toggleVendeurFields);
+            userTypeVendeur.addEventListener('change', toggleVendeurFields);
+        });
+    </script>
+}

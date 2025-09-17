@@ -1,0 +1,79 @@
+@model List<TPECOM.Models.Product>
+@{
+    ViewData["Title"] = $"Catégorie: {ViewBag.CategoryName}";
+}
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Catégorie: @ViewBag.CategoryName</h1>
+        <div class="dropdown">
+            <button class="btn btn-outline-dark dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                Trier par
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sortDropdown">
+                <li><a class="dropdown-item" href="/Products/Category/@ViewBag.CategoryName?sort=newest">Plus récents</a></li>
+                <li><a class="dropdown-item" href="/Products/Category/@ViewBag.CategoryName?sort=price-low">Prix croissant</a></li>
+                <li><a class="dropdown-item" href="/Products/Category/@ViewBag.CategoryName?sort=price-high">Prix décroissant</a></li>
+                <li><a class="dropdown-item" href="/Products/Category/@ViewBag.CategoryName?sort=popular">Popularité</a></li>
+            </ul>
+        </div>
+    </div>
+    
+    @if (Model.Count == 0)
+    {
+        <div class="alert alert-info">
+            <p class="mb-0">Aucun produit dans cette catégorie. <a href="/Products/Index">Parcourir tous nos produits</a>.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var product in Model)
+            {
+                <div class="col-md-6 col-lg-3">
+                    <div class="card border-0 shadow-sm h-100 product-card">
+                        <a href="/Products/Details/@product.Id" class="card-link">
+                            <div class="position-relative">
+                                <img src="@product.ImageUrl" class="card-img-top" alt="@product.Name">
+                            </div>
+                            <div class="card-body p-4">
+                                <h5 class="card-title mb-2">@product.Name</h5>
+                                <div class="d-flex align-items-center mb-2">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        if (i <= Math.Floor(product.Rating))
+                                        {
+                                            <i class="bi bi-star-fill text-warning fs-6"></i>
+                                        }
+                                        else if (i - 0.5 <= product.Rating)
+                                        {
+                                            <i class="bi bi-star-half text-warning fs-6"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-star text-warning fs-6"></i>
+                                        }
+                                    }
+                                    <span class="ms-1 text-muted small">(@product.Rating.ToString("0.0"))</span>
+                                </div>
+                                <p class="text-muted small mb-3">@product.ShortDescription</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">$@product.Price.ToString("0.00")</span>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="position-absolute" style="bottom: 20px; right: 20px;">
+                            <form action="/Cart/AddToCart" method="post" class="add-to-cart-form">
+                                <input type="hidden" name="productId" value="@product.Id">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="btn btn-sm btn-outline-dark rounded-circle">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div> 

@@ -1,0 +1,170 @@
+@model TPECOM.Models.Invoice
+@{
+    ViewData["Title"] = "Facture";
+}
+
+<div class="container py-5">
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-2">Facture #@Model.InvoiceNumber</h1>
+                    <p class="text-muted mb-0">Date d'émission: @Model.IssueDate.ToString("dd/MM/yyyy")</p>
+                </div>
+                <div class="text-end">
+                    <button class="btn btn-outline-dark" onclick="window.print()">
+                        <i class="bi bi-printer me-2"></i>Imprimer
+                    </button>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5>Facturé à:</h5>
+                    <address>
+                        <strong>Client #@Model.Order.UserId</strong><br>
+                        @Model.Order.BillingAddress
+                    </address>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <h5>Expédié à:</h5>
+                    <address>
+                        <strong>Client #@Model.Order.UserId</strong><br>
+                        @Model.Order.ShippingAddress
+                    </address>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5>Informations de paiement:</h5>
+                    <p>
+                        <strong>Date:</strong> @Model.Order.OrderDate.ToString("dd/MM/yyyy")<br>
+                        <strong>Statut:</strong> 
+                        @switch (Model.Status)
+                        {
+                            case InvoiceStatus.Pending:
+                                <span class="badge bg-warning text-dark">En attente</span>
+                                break;
+                            case InvoiceStatus.Paid:
+                                <span class="badge bg-success">Payée</span>
+                                break;
+                            case InvoiceStatus.Overdue:
+                                <span class="badge bg-danger">En retard</span>
+                                break;
+                            case InvoiceStatus.Cancelled:
+                                <span class="badge bg-secondary">Annulée</span>
+                                break;
+                        }
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <h5>Informations de commande:</h5>
+                    <p>
+                        <strong>Commande #:</strong> @Model.Order.Id<br>
+                        <strong>Date:</strong> @Model.Order.OrderDate.ToString("dd/MM/yyyy")<br>
+                        <strong>Statut:</strong> 
+                        @switch (Model.Order.Status)
+                        {
+                            case OrderStatus.Pending:
+                                <span class="badge bg-warning text-dark">En attente</span>
+                                break;
+                            case OrderStatus.Processing:
+                                <span class="badge bg-info text-dark">En traitement</span>
+                                break;
+                            case OrderStatus.Shipped:
+                                <span class="badge bg-primary">Expédiée</span>
+                                break;
+                            case OrderStatus.Delivered:
+                                <span class="badge bg-success">Livrée</span>
+                                break;
+                            case OrderStatus.Cancelled:
+                                <span class="badge bg-danger">Annulée</span>
+                                break;
+                            case OrderStatus.Refunded:
+                                <span class="badge bg-secondary">Remboursée</span>
+                                break;
+                        }
+                    </p>
+                </div>
+            </div>
+            
+            <div class="table-responsive mb-4">
+                <table class="table table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Produit</th>
+                            <th>Prix unitaire</th>
+                            <th>Quantité</th>
+                            <th class="text-end">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Order.Items)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="@item.ProductImageUrl" alt="@item.ProductName" class="me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                        <div>
+                                            <h6 class="mb-0">@item.ProductName</h6>
+                                            @if (!string.IsNullOrEmpty(item.Variant))
+                                            {
+                                                <small class="text-muted">@item.Variant</small>
+                                            }
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>$@item.Price.ToString("0.00")</td>
+                                <td>@item.Quantity</td>
+                                <td class="text-end">$@item.Subtotal.ToString("0.00")</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-end"><strong>Sous-total:</strong></td>
+                            <td class="text-end">$@Model.Order.Subtotal.ToString("0.00")</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="text-end"><strong>Frais de livraison:</strong></td>
+                            <td class="text-end">$@Model.Order.ShippingCost.ToString("0.00")</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="text-end"><strong>Taxes:</strong></td>
+                            <td class="text-end">$@Model.Order.Tax.ToString("0.00")</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                            <td class="text-end"><strong>$@Model.Order.Total.ToString("0.00")</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            
+            <div class="border-top pt-4">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Conditions et remarques:</h5>
+                        <p class="text-muted">
+                            Paiement dû dans les 30 jours. Veuillez inclure le numéro de facture sur votre chèque.
+                        </p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <p class="mb-0">Merci pour votre achat!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="d-flex justify-content-between">
+        <a href="/Order/Details/@Model.Order.Id" class="btn btn-outline-dark">
+            <i class="bi bi-arrow-left me-2"></i>Retour aux détails
+        </a>
+        <a href="/Order/History" class="btn btn-outline-dark">
+            <i class="bi bi-list-ul me-2"></i>Historique des commandes
+        </a>
+    </div>
+</div>
+

@@ -1,0 +1,127 @@
+@model TPECOM.Models.Order
+@{
+    ViewData["Title"] = "Confirmation de commande";
+}
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <div class="mb-4">
+            <i class="bi bi-check-circle-fill text-success display-1"></i>
+        </div>
+        <h1 class="h2 mb-3">Merci pour votre commande !</h1>
+        <p class="lead mb-4">Votre commande a été confirmée et sera traitée dans les plus brefs délais.</p>
+        <p class="mb-0">Numéro de commande: <strong>@Model.Id</strong></p>
+        <p>Date de commande: <strong>@Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</strong></p>
+    </div>
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h2 class="h5 mb-4">Détails de la commande</h2>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-borderless">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Produit</th>
+                                    <th>Prix unitaire</th>
+                                    <th>Quantité</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Items)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="@item.ProductImageUrl" alt="@item.ProductName" class="me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                                <div>
+                                                    <h6 class="mb-0">@item.ProductName</h6>
+                                                    @if (!string.IsNullOrEmpty(item.Variant))
+                                                    {
+                                                        <small class="text-muted">@item.Variant</small>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>$@item.Price.ToString("0.00")</td>
+                                        <td>@item.Quantity</td>
+                                        <td class="text-end">$@item.Subtotal.ToString("0.00")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" class="text-end">Sous-total:</td>
+                                    <td class="text-end">$@Model.Subtotal.ToString("0.00")</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" class="text-end">Livraison:</td>
+                                    <td class="text-end">$@Model.ShippingCost.ToString("0.00")</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" class="text-end">Taxes:</td>
+                                    <td class="text-end">$@Model.Tax.ToString("0.00")</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                    <td class="text-end"><strong>$@Model.Total.ToString("0.00")</strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <div class="row">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <h2 class="h5 mb-3">Adresse de livraison</h2>
+                            <p class="mb-0">@Model.ShippingAddress</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h2 class="h5 mb-3">Adresse de facturation</h2>
+                            <p class="mb-0">@Model.BillingAddress</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h2 class="h5 mb-3">Informations de paiement</h2>
+                    <p class="mb-0">Statut du paiement: <strong class="text-success">Payé</strong></p>
+                    @if (Model.Invoice != null)
+                    {
+                        <p class="mb-0">Numéro de facture: <strong>@Model.Invoice.InvoiceNumber</strong></p>
+                    }
+                    else
+                    {
+                        <p>Facture en cours de traitement</p>
+                    }
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-between">
+                @if (Model.Invoice != null)
+                {
+                    <a href="/Order/Invoice/@Model.Invoice.Id" class="btn btn-outline-dark">
+                        <i class="bi bi-file-earmark-text me-2"></i>Voir la facture
+                    </a>
+                }
+                else
+                {
+                    <button class="btn btn-outline-dark" disabled>
+                        <i class="bi bi-file-earmark-text me-2"></i>Facture en cours de génération
+                    </button>
+                }
+                <a href="/Order/History" class="btn btn-dark">
+                    <i class="bi bi-clock-history me-2"></i>Historique des commandes
+                </a>
+            </div>
+        </div>
+    </div>
+</div> 

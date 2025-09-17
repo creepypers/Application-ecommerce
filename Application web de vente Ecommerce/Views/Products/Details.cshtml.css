@@ -1,0 +1,38 @@
+.product-image-container {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.product-image {
+    width: 100%;
+    height: 400px;
+    object-fit: contain;
+    background-color: #f8f9fa;
+}
+
+.thumbnail {
+    cursor: pointer;
+    height: 80px;
+    object-fit: cover;
+    border: 2px solid transparent;
+    transition: border-color 0.3s ease;
+}
+
+.thumbnail.active, .thumbnail:hover {
+    border-color: #0d6efd;
+}
+
+.product-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.product-card img {
+    height: 200px;
+    object-fit: cover;
+}
+

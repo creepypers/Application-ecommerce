@@ -1,0 +1,237 @@
+@model TPECOM.Models.Checkout
+@{
+    ViewData["Title"] = "Paiement";
+}
+
+<div class="container py-5">
+    <h1 class="h3 mb-4">Finaliser votre commande</h1>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h2 class="h5 mb-4">Informations de livraison</h2>
+                    
+                    <form action="/Order/PlaceOrder" method="post" id="checkoutForm">
+                        <div class="mb-3">
+                            <label for="shippingAddress" class="form-label">Adresse de livraison</label>
+                            <textarea class="form-control" id="shippingAddress" name="shippingAddress" rows="3" required></textarea>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="sameAsBilling" checked>
+                            <label class="form-check-label" for="sameAsBilling">L'adresse de facturation est identique à l'adresse de livraison</label>
+                        </div>
+                        
+                        <div id="billingAddressContainer" style="display: none;">
+                            <div class="mb-3">
+                                <label for="billingAddress" class="form-label">Adresse de facturation</label>
+                                <textarea class="form-control" id="billingAddress" name="billingAddress" rows="3"></textarea>
+                            </div>
+                        </div>
+                        
+                        <h2 class="h5 mb-4 mt-5">Paiement par carte de crédit</h2>
+                        
+                        <div class="mb-3">
+                            <label for="card-element" class="form-label">Informations de carte</label>
+                            <div id="card-element" class="form-control" style="height: 40px; padding-top: 10px;"></div>
+                            <div id="card-errors" class="text-danger mt-2"></div>
+                        </div>
+                        
+                        <input type="hidden" name="paymentIntentId" id="paymentIntentId" value="@Model.PaymentIntentId" />
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h5 mb-3">Récapitulatif de la commande</h2>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-borderless">
+                            <tbody>
+                                @foreach (var item in Model.CartItems)
+                                {
+                                    <tr>
+                                        <td class="text-start">
+                                            <div class="d-flex align-items-center">
+                                                <img src="@item.ImageUrl" alt="@item.Name" class="img-fluid me-3" style="max-width: 60px;">
+                                                <div>
+                                                    <h6 class="mb-0">@item.Name</h6>
+                                                    @if (!string.IsNullOrEmpty(item.Variant))
+                                                    {
+                                                        <small class="text-muted">Variante: @item.Variant</small>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-end">
+                                            <span class="text-muted">@item.Quantity x @item.Price.ToString("C")</span>
+                                            <div class="fw-bold">@item.Subtotal.ToString("C")</div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Sous-total</span>
+                        <span>@Model.Subtotal.ToString("C")</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Livraison</span>
+                        <span>@Model.Shipping.ToString("C")</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Taxes</span>
+                        <span>@Model.Tax.ToString("C")</span>
+                    </div>
+                    <div class="d-flex justify-content-between fw-bold">
+                        <span>Total</span>
+                        <span>@Model.Total.ToString("C")</span>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <button type="button" id="submit-button" class="btn btn-primary w-100 py-2">Confirmer la commande</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h5 mb-4">Informations de paiement</h2>
+                    
+                    <p class="mb-2">Votre paiement est sécurisé par Stripe.</p>
+                    <p class="mb-4">Aucune information de carte n'est stockée sur nos serveurs.</p>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Méthodes acceptées:</span>
+                        <div>
+                            <i class="fab fa-cc-visa me-2 text-dark"> Visa </i>
+                            <i class="fab fa-cc-mastercard me-2 text-dark"> Mastercard </i>
+                            <i class="fab fa-cc-amex text-dark"> American Express </i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialisation de Stripe
+            const stripe = Stripe('@Model.PublicKey');
+            const elements = stripe.elements();
+            
+            // Création de l'élément de carte
+            const cardElement = elements.create('card', {
+                style: {
+                    base: {
+                        fontSize: '16px',
+                        color: '#32325d',
+                        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+                        '::placeholder': {
+                            color: '#aab7c4'
+                        }
+                    },
+                    invalid: {
+                        color: '#dc3545',
+                        iconColor: '#dc3545'
+                    }
+                }
+            });
+            
+            // Montage de l'élément de carte dans le DOM
+            cardElement.mount('#card-element');
+            
+            // Gestion des erreurs de l'élément de carte
+            cardElement.on('change', function(event) {
+                const displayError = document.getElementById('card-errors');
+                if (event.error) {
+                    displayError.textContent = event.error.message;
+                } else {
+                    displayError.textContent = '';
+                }
+            });
+            
+            // Gestion de l'adresse de facturation
+            const sameAsBillingCheckbox = document.getElementById('sameAsBilling');
+            const billingAddressContainer = document.getElementById('billingAddressContainer');
+            const shippingAddressInput = document.getElementById('shippingAddress');
+            const billingAddressInput = document.getElementById('billingAddress');
+            
+            sameAsBillingCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    billingAddressContainer.style.display = 'none';
+                } else {
+                    billingAddressContainer.style.display = 'block';
+                }
+            });
+            
+            // Gestion de la soumission du formulaire
+            const form = document.getElementById('checkoutForm');
+            const submitButton = document.getElementById('submit-button');
+            
+            submitButton.addEventListener('click', async function(e) {
+                e.preventDefault();
+                
+                // Désactiver le bouton pour éviter les soumissions multiples
+                submitButton.disabled = true;
+                submitButton.textContent = 'Traitement en cours...';
+                
+                // Vérifier l'adresse de livraison
+                if (!shippingAddressInput.value) {
+                    alert('Veuillez remplir l\'adresse de livraison.');
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Confirmer la commande';
+                    return;
+                }
+                
+                // Vérifier l'adresse de facturation
+                if (!sameAsBillingCheckbox.checked && !billingAddressInput.value) {
+                    alert('Veuillez remplir l\'adresse de facturation.');
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Confirmer la commande';
+                    return;
+                } else if (sameAsBillingCheckbox.checked) {
+                    billingAddressInput.value = shippingAddressInput.value;
+                }
+                
+                // Confirmer le paiement avec Stripe
+                const clientSecret = '@Model.ClientSecret';
+                
+                const result = await stripe.confirmCardPayment(clientSecret, {
+                    payment_method: {
+                        card: cardElement,
+                        billing_details: {
+                            address: {
+                                line1: billingAddressInput.value
+                            }
+                        }
+                    }
+                });
+                
+                if (result.error) {
+                    // Afficher l'erreur
+                    const errorElement = document.getElementById('card-errors');
+                    errorElement.textContent = result.error.message;
+                    
+                    // Réactiver le bouton
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Confirmer la commande';
+                } else {
+                    // Le paiement a été confirmé avec succès
+                    form.submit();
+                }
+            });
+        });
+    </script>
+} 

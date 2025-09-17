@@ -1,0 +1,39 @@
+﻿/* Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
+for details on configuring this project to bundle and minify static web assets. */
+
+/* Styles essentiels pour la mise en page */
+a.navbar-brand {
+  white-space: normal;
+  text-align: center;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
+}
+
+
+
+
+.footer {
+  position: relative;
+  padding-top: 1.5rem;
+  margin-top: auto;
+  width: 100%;
+  background-color: #f8f9fa;
+  padding-bottom: 1.5rem;
+  flex-shrink: 0;
+  margin-bottom:-100px;
+}
+
+
+

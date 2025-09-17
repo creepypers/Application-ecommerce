@@ -1,0 +1,80 @@
+﻿@{
+    ViewData["Title"] = "Accueil";
+}
+
+<div class="bg-dark text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-4 fw-bold mb-4">Bienvenue sur notre site</h1>
+                <p class="lead mb-4">Nous proposons des produits de qualité adaptés à vos besoins.</p>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                    <a href="/Products/Index" class="btn btn-primary btn-lg px-4">Découvrir nos produits</a>
+                    <a href="/Home/Contact" class="btn btn-outline-light btn-lg px-4">Nous contacter</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto text-center">
+            <h2 class="h3 mb-4">À propos de nous</h2>
+            <p class="mb-4">Notre entreprise s'engage à fournir des produits de qualité exceptionnels depuis plus de 10 ans. Nous mettons l'accent sur la qualité et la satisfaction client.</p>
+        </div>
+    </div>
+</div>
+
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="h3 text-center mb-4">Nos catégories</h2>
+        </div>
+    </div>
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
+        @foreach (var category in ViewBag.Categories)
+        {
+            <div class="col">
+                <a href="/Products/Category/@category" class="text-decoration-none">
+                    <div class="card h-100 border-0 shadow-sm category-card">
+                        <div class="card-body text-center">
+                            @{
+                                var iconClass = category.ToLower() switch
+                                {
+                                    var c when c.Contains("mobile") => "bi-phone",
+                                    var c when c.Contains("laptops") => "bi-laptop",
+                                    var c when c.Contains("fragrances") => "bi-droplet",
+                                    var c when c.Contains("beauty") => "bi-moisture",
+                                    var c when c.Contains("home") => "bi-house-heart",
+                                    var c when c.Contains("furniture") => "bi-lamp",
+                                    var c when c.Contains("watches") => "bi-watch",
+                                    _ => "bi-box"
+                                };
+                            }
+                            <i class="bi @iconClass mb-3" style="font-size: 2rem;"></i>
+                            <h5 class="card-title">@category</h5>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+        <div class="col">
+            <a href="/Products/Index" class="text-decoration-none">
+                <div class="card h-100 border-0 shadow-sm category-card">
+                    <div class="card-body text-center">
+                        <i class="bi bi-grid-3x3-gap mb-3" style="font-size: 2rem;"></i>
+                        <h5 class="card-title">Toutes les catégories</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+

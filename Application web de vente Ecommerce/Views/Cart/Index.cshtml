@@ -1,0 +1,171 @@
+@model List<TPECOM.Models.CartItem>
+@{
+    ViewData["Title"] = "Panier";
+}
+
+<div class="container py-5">
+    <h1 class="h3 mb-4">Panier</h1>
+    
+    @if (TempData["CartMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+            @TempData["CartMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-0">
+                    @if (Model.Count == 0)
+                    {
+                        <div class="p-5 text-center">
+                            <i class="bi bi-cart3 display-1 text-muted mb-3"></i>
+                            <h3>Votre panier est vide</h3>
+                            <p class="text-muted mb-4">Ajoutez des produits à votre panier pour commencer vos achats.</p>
+                            <div class="d-flex gap-3 justify-content-center">
+                                <a href="/Products/Index" class="btn btn-dark">Parcourir les produits</a>
+                                <a href="/Order/History" class="btn btn-outline-dark">
+                                    <i class="bi bi-clock-history me-2"></i>Historique des commandes
+                                </a>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-borderless align-middle mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="ps-4">Produit</th>
+                                        <th>Prix</th>
+                                        <th>Quantité</th>
+                                        <th>Total</th>
+                                        <th class="text-end pe-4">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td class="ps-4">
+                                                <div class="d-flex align-items-center">
+                                                    <img src="@item.ImageUrl" alt="@item.Name" class="cart-item-image me-3">
+                                                    <div>
+                                                        <h6 class="mb-0"><a href="/Products/Details/@item.ProductId" class="text-decoration-none text-dark">@item.Name</a></h6>
+                                                        <small class="text-muted">@item.Variant</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>$@item.Price.ToString("0.00")</td>
+                                            <td>
+                                                <div class="quantity-control">
+                                                    <form action="/Cart/UpdateQuantity" method="post" class="d-flex align-items-center">
+                                                        <input type="hidden" name="productId" value="@item.ProductId">
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary quantity-btn" onclick="decrementQuantity(this)">-</button>
+                                                        <input type="number" name="quantity" value="@item.Quantity" min="1" class="form-control form-control-sm quantity-input">
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary quantity-btn" onclick="incrementQuantity(this)">+</button>
+                                                        <button type="submit" class="btn btn-sm btn-outline-secondary ms-2 d-none">
+                                                            <i class="bi bi-arrow-repeat"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                            <td>$@item.Subtotal.ToString("0.00")</td>
+                                            <td class="text-end pe-4">
+                                                <form action="/Cart/RemoveFromCart" method="post" class="d-inline">
+                                                    <input type="hidden" name="productId" value="@item.ProductId">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+            
+            @if (Model.Count > 0)
+            {
+                <div class="d-flex justify-content-between">
+                    <a href="/Products/Index" class="btn btn-outline-dark"><i class="bi bi-arrow-left me-2"></i>Continuer les achats</a>
+                    <form action="/Cart/Clear" method="post">
+                        <button type="submit" class="btn btn-outline-danger">Vider le panier</button>
+                    </form>
+                </div>
+            }
+        </div>
+        
+        <div class="col-lg-4">
+            @if (Model.Count > 0)
+            {
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-4">Résumé de la commande</h5>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Sous-total</span>
+                            <span>$@ViewBag.Subtotal.ToString("0.00")</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Livraison</span>
+                            <span>$@ViewBag.Shipping.ToString("0.00")</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Taxes</span>
+                            <span>$@ViewBag.Tax.ToString("0.00")</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-4">
+                            <strong>Total</strong>
+                            <strong>$@ViewBag.Total.ToString("0.00")</strong>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <a href="/Order/Checkout" class="btn btn-dark">Procéder au paiement</a>
+                            <a href="/Order/History" class="btn btn-outline-dark">
+                                <i class="bi bi-clock-history me-2"></i>Voir mes commandes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4 text-center">
+                        <h5 class="mb-3">Besoin d'aide ?</h5>
+                        <p class="text-muted mb-3">Consultez vos commandes précédentes ou continuez vos achats.</p>
+                        <a href="/Order/History" class="btn btn-outline-dark w-100 mb-2">
+                            <i class="bi bi-clock-history me-2"></i>Historique des commandes
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function incrementQuantity(button) {
+            const input = button.previousElementSibling;
+            input.value = parseInt(input.value) + 1;
+            // Soumettre automatiquement le formulaire après modification
+            setTimeout(() => button.closest('form').submit(), 300);
+        }
+        
+        function decrementQuantity(button) {
+            const input = button.nextElementSibling;
+            const currentValue = parseInt(input.value);
+            if (currentValue > 1) {
+                input.value = currentValue - 1;
+                // Soumettre automatiquement le formulaire après modification
+                setTimeout(() => button.closest('form').submit(), 300);
+            }
+        }
+    </script>
+}

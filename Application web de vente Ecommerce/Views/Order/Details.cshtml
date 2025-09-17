@@ -1,0 +1,205 @@
+@model TPECOM.Models.Order
+@{
+    ViewData["Title"] = "Détails de la commande";
+}
+
+@if (TempData["OrderMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+        @TempData["OrderMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["OrderError"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+        @TempData["OrderError"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="/Order/History" class="text-decoration-none">Mes commandes</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Commande #@Model.Id</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h1 class="h3 mb-0">Commande #@Model.Id</h1>
+                        <span class="badge bg-@(Model.Status == TPECOM.Models.OrderStatus.Delivered ? "success" : 
+                                              Model.Status == TPECOM.Models.OrderStatus.Processing ? "primary" : 
+                                              Model.Status == TPECOM.Models.OrderStatus.Shipped ? "info" : 
+                                              Model.Status == TPECOM.Models.OrderStatus.Cancelled ? "danger" : "secondary")">
+                            @Model.Status
+                        </span>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <h5 class="h6 mb-3">Informations de commande</h5>
+                            <p class="mb-1"><strong>Date de commande:</strong> @Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
+                            @if (Model.Invoice != null)
+                            {
+                                <p class="mb-0">
+                                    <strong>Facture:</strong> 
+                                    <a href="/Order/Invoice/@Model.Invoice.Id" class="text-decoration-none">
+                                        @Model.Invoice.InvoiceNumber <i class="bi bi-file-earmark-text ms-1"></i>
+                                    </a>
+                                </p>
+                            }
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="h6 mb-3">Adresses</h5>
+                            <p class="mb-1"><strong>Livraison:</strong> @Model.ShippingAddress</p>
+                            <p class="mb-0"><strong>Facturation:</strong> @Model.BillingAddress</p>
+                        </div>
+                    </div>
+
+                    <h5 class="h6 mb-3">Articles commandés</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Produit</th>
+                                    <th>Prix unitaire</th>
+                                    <th>Quantité</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Items)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="@item.ProductImageUrl" alt="@item.ProductName" class="img-fluid me-3" style="max-width: 60px;">
+                                                <div>
+                                                    <h6 class="mb-0">@item.ProductName</h6>
+                                                    @if (!string.IsNullOrEmpty(item.Variant))
+                                                    {
+                                                        <small class="text-muted">Variante: @item.Variant</small>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>@item.Price.ToString("C")</td>
+                                        <td>@item.Quantity</td>
+                                        <td class="text-end">@item.Subtotal.ToString("C")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot class="table-light">
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Sous-total</strong></td>
+                                    <td class="text-end">€@Model.Items.Sum(i => i.Subtotal).ToString("0.00")</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Livraison</strong></td>
+                                    <td class="text-end">€@Model.ShippingCost.ToString("0.00")</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Taxes</strong></td>
+                                    <td class="text-end">€@Model.Tax.ToString("0.00")</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Total</strong></td>
+                                    <td class="text-end"><strong>€@(Model.Items.Sum(i => i.Subtotal) + Model.ShippingCost + Model.Tax)</strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h5 class="h6 mb-3">Suivi de commande</h5>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-success"></div>
+                            <div class="timeline-content">
+                                <h6 class="mb-0">Commande passée</h6>
+                                <p class="text-muted small mb-0">@Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
+                            </div>
+                        </div>
+                        
+                        @if (Model.Status == TPECOM.Models.OrderStatus.Processing || 
+                             Model.Status == TPECOM.Models.OrderStatus.Shipped || 
+                             Model.Status == TPECOM.Models.OrderStatus.Delivered)
+                        {
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-primary"></div>
+                                <div class="timeline-content">
+                                    <h6 class="mb-0">Commande en traitement</h6>
+                                    <p class="text-muted small mb-0">Votre commande est en cours de préparation</p>
+                                </div>
+                            </div>
+                        }
+                        
+                        @if (Model.Status == TPECOM.Models.OrderStatus.Shipped || 
+                             Model.Status == TPECOM.Models.OrderStatus.Delivered)
+                        {
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-info"></div>
+                                <div class="timeline-content">
+                                    <h6 class="mb-0">Commande expédiée</h6>
+                                    <p class="text-muted small mb-0">Votre commande est en route</p>
+                                </div>
+                            </div>
+                        }
+                        
+                        @if (Model.Status == TPECOM.Models.OrderStatus.Delivered)
+                        {
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-success"></div>
+                                <div class="timeline-content">
+                                    <h6 class="mb-0">Commande livrée</h6>
+                                    <p class="text-muted small mb-0">Votre commande a été livrée avec succès</p>
+                                </div>
+                            </div>
+                        }
+                        
+                        @if (Model.Status == TPECOM.Models.OrderStatus.Cancelled)
+                        {
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-danger"></div>
+                                <div class="timeline-content">
+                                    <h6 class="mb-0">Commande annulée</h6>
+                                    <p class="text-muted small mb-0">Votre commande a été annulée</p>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    @if (Model.Status == TPECOM.Models.OrderStatus.Processing || Model.Status == TPECOM.Models.OrderStatus.Pending)
+                    {
+                        <div class="mt-4">
+                            <form action="/Order/CancelOrder" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette commande ?');">
+                                <input type="hidden" name="id" value="@Model.Id">
+                                <button type="submit" class="btn btn-outline-danger w-100">
+                                    <i class="bi bi-x-circle me-2"></i>Annuler la commande
+                                </button>
+                            </form>
+                        </div>
+                    }
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2">
+                <a href="/Order/History" class="btn btn-outline-dark">
+                    <i class="bi bi-arrow-left me-2"></i>Retour à mes commandes
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

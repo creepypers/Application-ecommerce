@@ -1,0 +1,96 @@
+@model TPECOM.Models.Product
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="/Products" class="text-decoration-none">Produits</a></li>
+            <li class="breadcrumb-item"><a href="/Products/Category/@Model.Category" class="text-decoration-none">@Model.Category</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Name</li>
+        </ol>
+    </nav>
+    
+    <div class="row">
+        <div class="col-lg-6 mb-4 mb-lg-0">
+            <div class="product-image-container">
+                <img src="@Model.ImageUrl" class="img-fluid rounded product-image" alt="@Model.Name">
+            </div>
+            <div class="row mt-3">
+                <div class="col-3">
+                    <img src="@Model.ImageUrl" class="img-fluid rounded thumbnail active" alt="@Model.Name thumbnail 1">
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <h1 class="h2 mb-2">@Model.Name</h1>
+            <div class="d-flex align-items-center mb-2">
+                @for (int i = 1; i <= 5; i++)
+                {
+                    if (i <= Math.Floor(Model.Rating))
+                    {
+                        <i class="bi bi-star-fill text-warning"></i>
+                    }
+                    else if (i - 0.5 <= Model.Rating)
+                    {
+                        <i class="bi bi-star-half text-warning"></i>
+                    }
+                    else
+                    {
+                        <i class="bi bi-star text-warning"></i>
+                    }
+                }
+                <span class="ms-2 text-muted">(@Model.Rating.ToString("0.0"))</span>
+            </div>
+            <p class="text-muted mb-4">@Model.ShortDescription</p>
+            
+            <div class="mb-4">
+                <span class="fs-3 fw-bold">$@Model.Price.ToString("0.00")</span>
+            </div>
+            
+            <p class="mb-4">@Model.Description</p>
+            
+            <form action="/Cart/AddToCart" method="post" class="mb-4">
+                <input type="hidden" name="productId" value="@Model.Id">
+                <div class="row g-2 align-items-center mb-3">
+                    <div class="col-auto">
+                        <label for="quantity" class="col-form-label">Quantité</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="number" id="quantity" name="quantity" class="form-control" value="1" min="1" style="width: 70px;">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-dark btn-lg">Ajouter au panier</button>
+            </form>
+            
+            <div class="mb-3">
+                <strong>Catégorie:</strong> <a href="/Products/Category/@Model.Category" class="text-decoration-none">@Model.Category</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-5">
+        <div class="col-12">
+            <ul class="nav nav-tabs" id="productTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab" aria-controls="description" aria-selected="true">Description</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab" aria-controls="reviews" aria-selected="false">Avis (0)</button>
+                </li>
+            </ul>
+            <div class="tab-content p-4 border border-top-0 rounded-bottom" id="productTabsContent">
+                <div class="tab-pane fade show active" id="description" role="tabpanel" aria-labelledby="description-tab">
+                    <p>@Model.Description</p>
+                </div>
+                <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
+                    <p class="text-center my-5">Aucun avis pour le moment. Soyez le premier à donner votre avis sur ce produit !</p>
+                    <button class="btn btn-outline-dark">Écrire un avis</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

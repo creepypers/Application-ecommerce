@@ -1,0 +1,16 @@
+.card {
+    transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) ;
+}
+
+.btn-dark {
+    transition: all 0.3s ease;
+}
+
+.btn-dark:hover {
+    background-color: #343a40;
+    transform: translateY(-2px);
+} 

@@ -1,0 +1,127 @@
+@model TPECOM.Models.User
+@{
+    ViewData["Title"] = "Mon profil";
+}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4 p-md-5">
+                    <h1 class="h3 mb-4">Mon profil</h1>
+                    
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success mb-4">
+                            @TempData["SuccessMessage"]
+                        </div>
+                    }
+                    
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger mb-4">
+                            @TempData["ErrorMessage"]
+                        </div>
+                    }
+                    
+                    <form method="post" action="/Account/UpdateProfile">
+                        <input type="hidden" name="Id" value="@Model.Id">
+                        <input type="hidden" name="Password" value="@Model.Password">
+                        <input type="hidden" name="UserType" value="@Model.UserType">
+                        <input type="hidden" name="CreatedAt" value="@Model.CreatedAt">
+                        
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label for="FirstName" class="form-label">Prénom</label>
+                                <input type="text" class="form-control" id="FirstName" name="FirstName" value="@Model.FirstName" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="LastName" class="form-label">Nom</label>
+                                <input type="text" class="form-control" id="LastName" name="LastName" value="@Model.LastName" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="Email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="Email" name="Email" value="@Model.Email" required>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label">Type de compte</label>
+                            <input type="text" class="form-control" value="@Model.UserType" disabled>
+                        </div>
+                        
+                        @if (Model.UserType == UserType.Vendeur)
+                        {
+                            <hr class="my-4">
+                            <h4 class="h5 mb-3">Informations de l'entreprise</h4>
+                            
+                            <div class="mb-3">
+                                <label for="CompanyName" class="form-label">Nom de l'entreprise</label>
+                                <input type="text" class="form-control" id="CompanyName" name="CompanyName" value="@Model.CompanyName">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="CompanyAddress" class="form-label">Adresse de l'entreprise</label>
+                                <input type="text" class="form-control" id="CompanyAddress" name="CompanyAddress" value="@Model.CompanyAddress">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="CompanyPhone" class="form-label">Téléphone de l'entreprise</label>
+                                <input type="tel" class="form-control" id="CompanyPhone" name="CompanyPhone" value="@Model.CompanyPhone">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="CompanyDescription" class="form-label">Description de l'entreprise</label>
+                                <textarea class="form-control" id="CompanyDescription" name="CompanyDescription" rows="3">@Model.CompanyDescription</textarea>
+                            </div>
+                        }
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="#" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#changePasswordModal">Changer le mot de passe</a>
+                            <button type="submit" class="btn btn-dark">Enregistrer les modifications</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            @if (Model.UserType == UserType.Vendeur)
+            {
+                <div class="mt-4">
+                    <a href="/Seller/Dashboard" class="btn btn-primary w-100">Accéder au tableau de bord vendeur</a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour changer le mot de passe -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="changePasswordModalLabel">Changer le mot de passe</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="/Account/ChangePassword">
+                    <div class="mb-3">
+                        <label for="CurrentPassword" class="form-label">Mot de passe actuel</label>
+                        <input type="password" class="form-control" id="CurrentPassword" name="CurrentPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="NewPassword" class="form-label">Nouveau mot de passe</label>
+                        <input type="password" class="form-control" id="NewPassword" name="NewPassword" required minlength="6">
+                    </div>
+                    <div class="mb-3">
+                        <label for="ConfirmNewPassword" class="form-label">Confirmer le nouveau mot de passe</label>
+                        <input type="password" class="form-control" id="ConfirmNewPassword" name="ConfirmNewPassword" required>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-dark">Changer le mot de passe</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div> 

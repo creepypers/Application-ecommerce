@@ -1,0 +1,69 @@
+/* Styles généraux pour la facture */
+.invoice-header {
+    margin-bottom: 2rem;
+}
+
+.invoice-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.invoice-details {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+/* Styles pour les informations client */
+address {
+    margin-bottom: 0;
+    font-style: normal;
+}
+
+/* Styles pour le tableau des produits */
+.table-invoice th {
+    font-weight: 600;
+    background-color: #f8f9fa;
+}
+
+.table-invoice img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.product-name {
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.product-variant {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+/* Styles pour les totaux */
+.invoice-total {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+/* Styles pour les badges de statut */
+.badge {
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+}
+
+/* Styles pour les boutons d'action */
+.invoice-actions {
+    margin-top: 2rem;
+}
+
+.invoice-actions .btn {
+    transition: all 0.3s ease;
+}
+
+.invoice-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+} 

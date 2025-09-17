@@ -1,0 +1,42 @@
+.product-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.product-card img {
+    height: 250px;
+    object-fit: cover;
+}
+
+.card-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+.dropdown-item:active {
+    background-color: #0d6efd;
+    color: white;
+}
+
+/* Modification du système de lien pour éviter le chevauchement */
+.product-card a.card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+/* Pour s'assurer que le bouton d'ajout au panier reste cliquable */
+.product-card .add-to-cart-form {
+    position: relative;
+    z-index: 2;
+} 

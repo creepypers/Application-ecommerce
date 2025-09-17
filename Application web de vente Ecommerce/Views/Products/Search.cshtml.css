@@ -1,0 +1,49 @@
+.product-card {
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
+    overflow: hidden;
+}
+
+.product-card:hover {
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    transform: translateY(-5px);
+}
+
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+.card-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.btn-outline-dark {
+    transition: all 0.2s ease;
+}
+
+.btn-outline-dark:hover {
+    background-color: #212529;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border-color: #212529;
+}
+
+.add-to-cart-form button {
+    transition: all 0.2s ease;
+}
+
+.add-to-cart-form button:hover {
+    background-color: #212529;
+    color: white;
+    transform: translateY(-2px);
+} 
